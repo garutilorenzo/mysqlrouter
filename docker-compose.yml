@@ -1,0 +1,18 @@
+version: '3.4'
+services:
+  mysqlrouter:
+    image: garutilorenzo/mysqlrouter
+    volumes:
+      - type: volume
+        source: mysqlrouter
+        target: /app/mysqlrouter/
+        volume:
+          nocopy: true
+    environment:
+     - MYSQL_HOST=mysql_node01
+     - MYSQL_PORT=3306
+     - MYSQL_USER=root
+     - MYSQL_PASSWORD=root
+
+volumes:
+ mysqlrouter:
