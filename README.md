@@ -17,3 +17,5 @@
 * MYSQL_PASSWORD: mysql user password
 * MYSQL_HC_USER: mysql healtcheck user with necessary grants (optional)
 * MYSQL_HC_PASWORD: mysql healtcheck user password (optional)
+
+![MySQL Router Build](https://github.com/garutilorenzo/mysqlrouter/actions/workflows/docker-image.yml/badge.svg)
