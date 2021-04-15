@@ -22,4 +22,4 @@ jobs:
         image: "localbuild/mysqlrouter:latest"
         fail-build: false
     - name: grype scan JSON results
-      run: find . -iname "*.json"
+      run: cat ./vulnerabilities.json
