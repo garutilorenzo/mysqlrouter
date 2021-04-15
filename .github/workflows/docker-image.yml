@@ -11,7 +11,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    outputs:
+      vulnerabilities: "./vulnerabilities.json"
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
@@ -21,4 +22,4 @@ jobs:
         image: "localbuild/mysqlrouter:latest"
         fail-build: false
     - name: grype scan JSON results
-      run: find . -iname "*anchore-reports*"
+      run: find . -iname "*.json"
