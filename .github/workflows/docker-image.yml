@@ -15,4 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build --pull --no-cache mysqlrouter/ -f mysqlrouter/Dockerfile --tag mysqlrouter:$(date +%s)
+      run: docker build --pull --no-cache mysqlrouter/ -f mysqlrouter/Dockerfile --tag localbuild/mysqlrouter:latest
+    - uses: anchore/scan-action@v2
+      with:
+        image: "localbuild/mysqlrouter:latest"
+        fail-build: true
+    - name: grype scan JSON results
+      run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
