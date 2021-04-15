@@ -21,4 +21,4 @@ jobs:
         image: "localbuild/mysqlrouter:latest"
         fail-build: false
     - name: grype scan JSON results
-      run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
+      run: find . -iname "*anchore-reports*"
