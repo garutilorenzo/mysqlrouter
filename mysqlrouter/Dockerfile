@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:buster-slim
 
 RUN apt-get update && apt-get -y upgrade && apt-get install -y --no-install-recommends wget lsb-release gnupg hostname dirmngr && rm -rf /var/lib/apt/lists/* 
 RUN mkdir ~/.gnupg && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
@@ -15,9 +15,9 @@ RUN set -ex; \
 	apt-key list > /dev/null
 
 ENV MYSQL_MAJOR 8.0
-ENV MYSQL_VERSION 8.0.23-1debian9
+ENV MYSQL_VERSION 8.0.23-1debian10
 
-RUN echo "deb http://repo.mysql.com/apt/debian/ stretch mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
+RUN echo "deb http://repo.mysql.com/apt/debian/ buster mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
 
 # the "/var/lib/mysql" stuff here is because the mysql-server postinst doesn't have an explicit way to disable the mysql_install_db codepath besides having a database already "configured" (ie, stuff in /var/lib/mysql/mysql)
 # also, we set debconf keys to make APT a little quieter
@@ -32,7 +32,7 @@ RUN { \
 RUN wget --no-check-certificate https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb && dpkg -i mysql-apt-config_0.8.16-1_all.deb # Ref. https://dev.mysql.com/downloads/
 RUN apt-get update && apt-get install -y --no-install-recommends mysql-router && rm -rf /var/lib/apt/lists/*
 
-#ARG MYSQL_ROUTER_VERSION=8.0.18-1debian9_amd64
+#ARG MYSQL_ROUTER_VERSION=8.0.18-1debian10_amd64
 #RUN wget --no-check-certificate https://downloads.mysql.com/archives/get/p/41/file/mysql-router-community_${MYSQL_ROUTER_VERSION}.deb \
 #    && dpkg -i mysql-router-community_${MYSQL_ROUTER_VERSION}.deb\
 #    && rm -rf  mysql-router-community_${MYSQL_ROUTER_VERSION}.deb
