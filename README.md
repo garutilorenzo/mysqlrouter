@@ -1,3 +1,9 @@
+![MySQL Router Build](https://github.com/garutilorenzo/mysqlrouter/actions/workflows/docker-image.yml/badge.svg)
+[![GitHub issues](https://img.shields.io/github/issues/garutilorenzo/mysqlrouter)](https://github.com/garutilorenzo/mysqlrouter/issues)
+![GitHub](https://img.shields.io/github/license/garutilorenzo/mysqlrouter)
+[![GitHub forks](https://img.shields.io/github/forks/garutilorenzo/mysqlrouter)](https://github.com/garutilorenzo/mysqlrouter/network)
+[![GitHub stars](https://img.shields.io/github/stars/garutilorenzo/mysqlrouter)](https://github.com/garutilorenzo/laravel-docker/stargazers)
+
 # MySQL Router docker image
 
 * [MySQL Router](https://dev.mysql.com/doc/mysql-router/8.0/en/) - MySQL Router is part of InnoDB Cluster, and is lightweight middleware that provides transparent routing between your application and back-end MySQL Servers
@@ -17,5 +23,3 @@
 * MYSQL_PASSWORD: mysql user password
 * MYSQL_HC_USER: mysql healtcheck user with necessary grants (optional)
 * MYSQL_HC_PASWORD: mysql healtcheck user password (optional)
-
-![MySQL Router Build](https://github.com/garutilorenzo/mysqlrouter/actions/workflows/docker-image.yml/badge.svg)
