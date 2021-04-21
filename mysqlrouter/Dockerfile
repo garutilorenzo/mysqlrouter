@@ -39,10 +39,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends mysql-router &&
 
 RUN rm -rf /etc/mysqlrouter # cleanup 
 
-# ARG UID=897
-# ARG GID=897
-# RUN groupadd -g ${GID} mysqlrouter 
-# RUN useradd -u ${UID} -g ${GID} -m -d /app -s /bin/bash mysqlrouter
 RUN usermod -d /app mysqlrouter
 RUN mkdir -p /app/mysqlrouter/ && chown -R mysqlrouter:mysqlrouter /app
 
