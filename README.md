@@ -12,14 +12,21 @@
 
 * MySQL Router runs in /app/mysqlrouter
 * MySQL Router persist configurations on /app/mysqlrouter path (if volume is attached see docker-compose.yml)
-* MySQL Router run a "bootstrap" only if no configuration is found in /app/mysqlrouter
+* MySQL Router run a [bootstrap](https://dev.mysql.com/doc/mysql-router/8.0/en/mysql-router-deploying-bootstrapping.html) only if no configuration is found in /app/mysqlrouter
 * Healtcheck is disabled by default, it can be enabled if necessary (see docker-compose.yml.healtcheck)
 * MySQL Router doesn't wait for all cluster members to be up
 
 ## Environment variables
-* MYSQL_HOST: master node
-* MYSQL_PORT: mysql port
-* MYSQL_USER: mysql user with necessary grants
-* MYSQL_PASSWORD: mysql user password
-* MYSQL_HC_USER: mysql healtcheck user with necessary grants (optional)
-* MYSQL_HC_PASWORD: mysql healtcheck user password (optional)
+
+This container accept this environment variables:
+
+| Variable   | Required | Description |
+| ------- | -------- | ------- | ----------- |
+| `MYSQL_HOST` | `yes` |  master node |
+| `MYSQL_PORT` | `yes` |  mysql port |
+| `MYSQL_USER` | `yes` |  mysql user with necessary grants |
+| `MYSQL_PASSWORD` | `yes` |  password of MYSQL_USER |
+| `MYSQL_HC_USER` | `no` |  mysql healtcheck user with necessary grants (optional) |
+| `MYSQL_HC_PASWORD` | `no` |  mysql healtcheck user password (optional)
+| `MYSQL_ROUTER_ACCOUNT` | `no` |  mysql user created when mysqlrouter run a bootstrap |
+| `MYSQL_ROUTER_PASSWORD` | `no` |  password of MYSQL_ROUTER_ACCOUNT |
