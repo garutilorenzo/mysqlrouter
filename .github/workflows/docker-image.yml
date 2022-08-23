@@ -6,21 +6,40 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  CURRENT_MYSQL_VERSION: 8.0.30
+  CURRENT_MYSQL_MAYOR_VERSION: 8
+
 jobs:
 
   build:
 
     runs-on: ubuntu-latest
-    outputs:
-      vulnerabilities: "./vulnerabilities.json"
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build --pull --no-cache mysqlrouter/ -f mysqlrouter/Dockerfile --tag localbuild/mysqlrouter:latest
+      run: docker build --pull --no-cache mysqlrouter/ -f mysqlrouter/Dockerfile --tag ${{ secrets.DOCKER_USER }}/mysqlrouter:latest
+    - name: docker login
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - name: docker push mysqlrouter image
+      run: |
+        IMAGE_ID=${{ secrets.DOCKER_USER }}/mysqlrouter:$CURRENT_MYSQL_VERSION
+        IMAGE_ID_MAYOR=${{ secrets.DOCKER_USER }}/mysqlrouter:$CURRENT_MYSQL_MAYOR_VERSION
+        echo IMAGE_ID=$IMAGE_ID
+        echo IMAGE_ID=$IMAGE_ID_MAYOR
+        docker tag ${{ secrets.DOCKER_USER }}/mysqlrouter:latest $IMAGE_ID
+        docker tag ${{ secrets.DOCKER_USER }}/mysqlrouter:latest $IMAGE_ID_MAYOR
+        docker push $IMAGE_ID
+        docker push $IMAGE_ID_MAYOR
+        docker push ${{ secrets.DOCKER_USER }}/mysqlrouter:latest
     - uses: anchore/scan-action@v2
       id: scan
       with:
-        image: "localbuild/mysqlrouter:latest"
+        image: "${{ secrets.DOCKER_USER }}/mysqlrouter:latest"
         acs-report-enable: true
     - name: upload Anchore scan SARIF report
       uses: github/codeql-action/upload-sarif@v1

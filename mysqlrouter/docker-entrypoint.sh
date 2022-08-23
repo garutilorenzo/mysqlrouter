@@ -19,13 +19,13 @@ BASE_PATH=/app/mysqlrouter
 
 if [ "$1" = 'mysqlrouter' ]; then
     if [[ -z $MYSQL_HOST || -z $MYSQL_PORT || -z $MYSQL_USER || -z $MYSQL_PASSWORD ]]; then
-	    echo "We require all of"
-	    echo "    MYSQL_HOST"
-	    echo "    MYSQL_PORT"
-	    echo "    MYSQL_USER"
-	    echo "    MYSQL_PASSWORD"
-	    echo "to be set. Exiting."
-	    exit 1
+        echo "We require all of"
+        echo "    MYSQL_HOST"
+        echo "    MYSQL_PORT"
+        echo "    MYSQL_USER"
+        echo "    MYSQL_PASSWORD"
+        echo "to be set. Exiting."
+        exit 1
     fi
 
     PASSFILE=$(mktemp)
@@ -37,14 +37,14 @@ password="$MYSQL_PASSWORD"
 EOF
     unset MYSQL_PASSWORD
     until mysql --defaults-extra-file="$DEFAULTS_EXTRA_FILE" -h "$MYSQL_HOST" -P"$MYSQL_PORT" -u "$MYSQL_USER" -nsLNE -e 'exit'; do
-	  >&2 echo "MySQL is unavailable - sleeping"
-	  sleep 5
+      >&2 echo "MySQL is unavailable - sleeping"
+      sleep 5
     done
 
     echo "Succesfully contacted mysql server at $MYSQL_HOST. Checking for cluster state."
     if ! [[ "$(mysql --defaults-extra-file="$DEFAULTS_EXTRA_FILE" -u "$MYSQL_USER" -h "$MYSQL_HOST" -P "$MYSQL_PORT" -e "show status;" 2> /dev/null)" ]]; then
-	    echo "Can not connect to database. Exiting."
-	    exit 1
+        echo "Can not connect to database. Exiting."
+        exit 1
     fi
 
     echo "Check if config exist"
@@ -53,8 +53,19 @@ EOF
        echo "Start mysqlrouter"
        exec "$@" --config $BASE_PATH/mysqlrouter.conf
     else 
+        if [[ -z $MYSQL_ROUTER_ACCOUNT ]]; then
+            echo "MYSQL_ROUTER_ACCOUNT env var is not defined. mysqlrouter will bootstrap with a random user"
+        else
+            if [[ -z $MYSQL_ROUTER_PASSWORD ]]; then
+                echo "MYSQL_ROUTER_PASSWORD is required when MYSQL_ROUTER_ACCOUNT is defined"
+                exit 1
+            fi
+            echo $MYSQL_ROUTER_PASSWORD >> "$PASSFILE"
+            echo "bootstrap mysqlrouter with account $MYSQL_ROUTER_ACCOUNT"
+            ACCOUNT_PARAMETER="--account $MYSQL_ROUTER_ACCOUNT --account-create always"
+        fi
         echo "Succesfully contacted mysql server at $MYSQL_HOST. Trying to bootstrap."
-        mysqlrouter --bootstrap "$MYSQL_USER@$MYSQL_HOST:$MYSQL_PORT" --user=mysqlrouter --directory $BASE_PATH --force < "$PASSFILE"
+        mysqlrouter --bootstrap "$MYSQL_USER@$MYSQL_HOST:$MYSQL_PORT" --user=mysqlrouter --directory $BASE_PATH $ACCOUNT_PARAMETER --force < "$PASSFILE"
         sed -i -e 's/logging_folder=.*$/logging_folder=/' $BASE_PATH/mysqlrouter.conf
         echo "Starting mysql-router."
         exec "$@" --config $BASE_PATH/mysqlrouter.conf
