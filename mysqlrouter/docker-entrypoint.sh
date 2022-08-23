@@ -53,8 +53,11 @@ EOF
        echo "Start mysqlrouter"
        exec "$@" --config $BASE_PATH/mysqlrouter.conf
     else 
-        if [[ -z $MYSQL_ROUTER_ACCOUNT ]]; then
-            echo "MYSQL_ROUTER_ACCOUNT env var is not defined. mysqlrouter will bootstrap with a random user"
+        USER_EXIST=$(mysql --defaults-extra-file="$DEFAULTS_EXTRA_FILE" -u "$MYSQL_USER" -h "$MYSQL_HOST" -P "$MYSQL_PORT" -Nse "select count(*) from mysql.user where User like '$MYSQL_ROUTER_ACCOUNT%';")
+        echo "DEBUG"
+        echo "$USER_EXIST"
+        if [[ -z $MYSQL_ROUTER_ACCOUNT || $USER_EXIST -eq 1 ]]; then
+            echo "MYSQL_ROUTER_ACCOUNT env var is not defined or MYSQL_ROUTER_ACCOUNT already exist."
         else
             if [[ -z $MYSQL_ROUTER_PASSWORD ]]; then
                 echo "MYSQL_ROUTER_PASSWORD is required when MYSQL_ROUTER_ACCOUNT is defined"
