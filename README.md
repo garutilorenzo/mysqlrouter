@@ -21,7 +21,7 @@
 This container accept this environment variables:
 
 | Variable   | Required | Description |
-| ------- | -------- | ------- | ----------- |
+| ------- | -------- | ----------- |
 | `MYSQL_HOST` | `yes` |  master node |
 | `MYSQL_PORT` | `yes` |  mysql port |
 | `MYSQL_USER` | `yes` |  mysql user with necessary grants |
