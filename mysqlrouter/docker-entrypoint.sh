@@ -63,7 +63,6 @@ EOF
             echo $MYSQL_ROUTER_PASSWORD >> "$PASSFILE"
             echo "bootstrap mysqlrouter with account $MYSQL_ROUTER_ACCOUNT"
             ACCOUNT_PARAMETER="--account $MYSQL_ROUTER_ACCOUNT --account-create if-not-exists"
-            fi
         fi
         echo "Succesfully contacted mysql server at $MYSQL_HOST. Trying to bootstrap."
         mysqlrouter --bootstrap "$MYSQL_USER@$MYSQL_HOST:$MYSQL_PORT" --user=mysqlrouter --directory $BASE_PATH $ACCOUNT_PARAMETER --force < "$PASSFILE"
