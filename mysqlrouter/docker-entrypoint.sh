@@ -60,19 +60,9 @@ EOF
                 echo "MYSQL_ROUTER_PASSWORD is required when MYSQL_ROUTER_ACCOUNT is defined"
                 exit 1
             fi
-            USER_EXIST=$(mysql --defaults-extra-file="$DEFAULTS_EXTRA_FILE" -u "$MYSQL_USER" -h "$MYSQL_HOST" -P "$MYSQL_PORT" -Nse "select count(*) from mysql.user where User like '$MYSQL_ROUTER_ACCOUNT%';")
-            if [[ $USER_EXIST -eq 1 ]]; then
-                echo "mysqlrouter user exist on DB. Creating mysqlrouter.key file"
-                if [ ! -f "$BASE_PATH/mysqlrouter.key" ]; then
-                    mkdir -p $BASE_PATH/data/keyring
-                    chown -R mysqlrouter:mysqlrouter $BASE_PATH/data/keyring
-                    mysqlrouter_keyring init --master-key-file=$BASE_PATH/mysqlrouter.key $BASE_PATH/data/keyring
-                fi
-                mysqlrouter_keyring set --master-key-file=$BASE_PATH/mysqlrouter.key $BASE_PATH/data/keyring $MYSQL_ROUTER_ACCOUNT password $MYSQL_ROUTER_PASSWORD
-            else
-                echo $MYSQL_ROUTER_PASSWORD >> "$PASSFILE"
-                echo "bootstrap mysqlrouter with account $MYSQL_ROUTER_ACCOUNT"
-                ACCOUNT_PARAMETER="--account $MYSQL_ROUTER_ACCOUNT --account-create always"
+            echo $MYSQL_ROUTER_PASSWORD >> "$PASSFILE"
+            echo "bootstrap mysqlrouter with account $MYSQL_ROUTER_ACCOUNT"
+            ACCOUNT_PARAMETER="--account $MYSQL_ROUTER_ACCOUNT --account-create if-not-exists"
             fi
         fi
         echo "Succesfully contacted mysql server at $MYSQL_HOST. Trying to bootstrap."
