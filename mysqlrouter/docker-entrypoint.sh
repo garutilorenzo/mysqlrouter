@@ -52,18 +52,26 @@ EOF
        echo "Config found."
        echo "Start mysqlrouter"
        exec "$@" --config $BASE_PATH/mysqlrouter.conf
-    else 
-        USER_EXIST=$(mysql --defaults-extra-file="$DEFAULTS_EXTRA_FILE" -u "$MYSQL_USER" -h "$MYSQL_HOST" -P "$MYSQL_PORT" -Nse "select count(*) from mysql.user where User like '$MYSQL_ROUTER_ACCOUNT%';")
-        if [[ -z $MYSQL_ROUTER_ACCOUNT || $USER_EXIST -eq 1 ]]; then
-            echo "MYSQL_ROUTER_ACCOUNT env var is not defined or MYSQL_ROUTER_ACCOUNT already exist."
+    else        
+        if [[ -z $MYSQL_ROUTER_ACCOUNT ]]; then
+            echo "MYSQL_ROUTER_ACCOUNT env var is not defined. Creating random user/pw for mysqlrouter"
         else
             if [[ -z $MYSQL_ROUTER_PASSWORD ]]; then
                 echo "MYSQL_ROUTER_PASSWORD is required when MYSQL_ROUTER_ACCOUNT is defined"
                 exit 1
             fi
-            echo $MYSQL_ROUTER_PASSWORD >> "$PASSFILE"
-            echo "bootstrap mysqlrouter with account $MYSQL_ROUTER_ACCOUNT"
-            ACCOUNT_PARAMETER="--account $MYSQL_ROUTER_ACCOUNT --account-create always"
+            USER_EXIST=$(mysql --defaults-extra-file="$DEFAULTS_EXTRA_FILE" -u "$MYSQL_USER" -h "$MYSQL_HOST" -P "$MYSQL_PORT" -Nse "select count(*) from mysql.user where User like '$MYSQL_ROUTER_ACCOUNT%';")
+            if [[ $USER_EXIST -eq 1 ]]; then
+                echo "mysqlrouter user exist on DB. Creating mysqlrouter.key file"
+                if [ ! -f "$BASE_PATH/mysqlrouter.key" ]; then
+                    mysqlrouter_keyring init --master-key-file=$BASE_PATH/mysqlrouter.key $BASE_PATH/data/keyring
+                fi
+                mysqlrouter_keyring set --master-key-file=$BASE_PATH/mysqlrouter.key $BASE_PATH/data/keyring $MYSQL_ROUTER_ACCOUNT password $MYSQL_ROUTER_PASSWORD
+            else
+                echo $MYSQL_ROUTER_PASSWORD >> "$PASSFILE"
+                echo "bootstrap mysqlrouter with account $MYSQL_ROUTER_ACCOUNT"
+                ACCOUNT_PARAMETER="--account $MYSQL_ROUTER_ACCOUNT --account-create always"
+            fi
         fi
         echo "Succesfully contacted mysql server at $MYSQL_HOST. Trying to bootstrap."
         mysqlrouter --bootstrap "$MYSQL_USER@$MYSQL_HOST:$MYSQL_PORT" --user=mysqlrouter --directory $BASE_PATH $ACCOUNT_PARAMETER --force < "$PASSFILE"
