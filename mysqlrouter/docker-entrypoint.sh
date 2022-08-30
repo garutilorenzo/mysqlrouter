@@ -64,6 +64,8 @@ EOF
             if [[ $USER_EXIST -eq 1 ]]; then
                 echo "mysqlrouter user exist on DB. Creating mysqlrouter.key file"
                 if [ ! -f "$BASE_PATH/mysqlrouter.key" ]; then
+                    mkdir -p $BASE_PATH/data/keyring
+                    chown -R mysqlrouter:mysqlrouter $BASE_PATH/data/keyring
                     mysqlrouter_keyring init --master-key-file=$BASE_PATH/mysqlrouter.key $BASE_PATH/data/keyring
                 fi
                 mysqlrouter_keyring set --master-key-file=$BASE_PATH/mysqlrouter.key $BASE_PATH/data/keyring $MYSQL_ROUTER_ACCOUNT password $MYSQL_ROUTER_PASSWORD
